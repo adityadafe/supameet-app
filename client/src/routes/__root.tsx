@@ -7,6 +7,7 @@ import TypingTest from "@/components/typer";
 import TypingKeyboard from "@/components/keyboard";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import Footer from "@/components/footer";
 
 
 function RootComponent() {
@@ -70,23 +71,17 @@ function RootComponent() {
 
     async function getCurrentSongLyrics() {
       try {
-        const rawSongLyrics = await fetch(`https://api.lyrics.ovh/v1/${currentSong.artist}/${currentSong.name}`, {
+        const rawSongLyrics = await fetch("https://twffnqmwqvpgvpdxkbvb.supabase.co/functions/v1/add-cache", {
+          method: "POST",
           headers: {
-            "accept": "application/json, text/javascript, */*; q=0.01",
-            "accept-language": "en-US,en;q=0.9",
-            "sec-ch-ua": "\"Google Chrome\";v=\"131\", \"Chromium\";v=\"131\", \"Not_A Brand\";v=\"24\"",
-            "sec-ch-ua-mobile": "?0",
-            "sec-ch-ua-platform": "\"Linux\"",
-            "sec-fetch-dest": "empty",
-            "sec-fetch-mode": "cors",
-            "sec-fetch-site": "same-site"
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_KEY}`,
           },
-          referrer: "https://lyrics.ovh/",
-          referrerPolicy: "strict-origin-when-cross-origin",
-          method: "GET",
-          mode: "cors",
-          credentials: "omit"
-        });
+          body: JSON.stringify({
+            song: currentSong.name,
+            artist_name: currentSong.artist,
+          }),
+      })
 
         if (!rawSongLyrics.ok) {
           console.error('Failed to fetch lyrics');
@@ -95,8 +90,8 @@ function RootComponent() {
 
         const songLyricsData = await rawSongLyrics.json();
         if (songLyricsData.lyrics !== songLyrics) {
-          console.log(songLyricsData.lyrics);
-          setSongLyrics(songLyricsData.lyrics);
+          console.log(songLyricsData.data.lyrics);
+          setSongLyrics(songLyricsData.data.lyrics);
         }
       } catch (error) {
         console.error('Error fetching lyrics:', error);
@@ -190,6 +185,7 @@ function RootComponent() {
       />
       <TypingTest sampleText={songLyrics ? songLyrics : "Please"+"login"} />
       <TypingKeyboard />
+      <Footer/>
     </>
   );
 }
