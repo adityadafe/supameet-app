@@ -17,8 +17,8 @@ export default function Header() {
                 return;
             }
             setSession(data.session);
-            console.log(session)
             setIsAuthenticated(!!data.session);
+            console.log(data.session)
         }
         getUserSession();
     }, []);
@@ -33,27 +33,28 @@ export default function Header() {
                             "Authorization": `Bearer ${session.provider_token}`,
                         },
                     });
-    
+
                     if (getCurrSongRawRes.status === 204) {
                         // No song currently playing
                         setCurrentSong(null);
                         return;
                     }
-    
+
                     const { item } = await getCurrSongRawRes.json();
-                    const songData = { 
-                        id: item.id, 
+                    const songData = {
+                        id: item.id,
                         image: encodeURIComponent(item.album.images[0].url),
                         name: item.name,
                         artist: item.artists[0].name
                     };
                     setCurrentSong(songData);
+                    console.log(songData)
                 } catch (error) {
                     console.error('Error in fetch:', error);
                 }
             }
         }
-    
+
         async function getCurrentSongLyrics() {
             if (currentSong) {
                 try {
@@ -92,60 +93,59 @@ export default function Header() {
             }
         }
     
-        // Separate these into two useEffects or use a more controlled flow
         if (isAuthenticated) {
             getCurrentSong().then(() => {
-                // Only attempt to get lyrics after song is fetched
                 getCurrentSongLyrics();
             });
         }
-    }, [isAuthenticated, session]); 
 
-    async function signInWithSpotify() {
-        const { data , error } = await supabase.auth.signInWithOAuth({
-            provider: "spotify",
-            options: {
-                scopes: "user-read-currently-playing",
-            }
-        });
+    }, [isAuthenticated, session]);
 
-        if (error) {
-            console.error("Error signing in:", error.message);
-            alert("Failed to sign in with Spotify. Please try again.");
+async function signInWithSpotify() {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: "spotify",
+        options: {
+            scopes: "user-read-currently-playing",
         }
-    }
+    });
 
-    return (
-        <motion.header
-            className="bg-transparent backdrop-blur-sm opacity-100 bg-size-4 mask-gradient"
-            initial={{ opacity: 0, y: -50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-        >
-            <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-                <a href="/" className="text-2xl font-bold text-gray-900">
-                    Typify
-                </a>
-                <nav>
-                    <ul className="flex space-x-8">
-                        {isAuthenticated ? (
-                            <Button
-                                className='bg-green-300'
-                                onClick={() => console.log(currentSong)}
-                            >
-                                {currentSong ? 'Now Playing' : 'Signed In'}
-                            </Button>
-                        ) : (
-                            <Button
-                                className='bg-green-300'
-                                onClick={signInWithSpotify}
-                            >
-                                <AiOutlineSpotify size={20} />
-                            </Button>
-                        )}
-                    </ul>
-                </nav>
-            </div>
-        </motion.header>
-    );
+    if (error) {
+        console.error("Error signing in:", error.message);
+        alert("Failed to sign in with Spotify. Please try again.");
+    }
+}
+
+return (
+    <motion.header
+        className="bg-transparent backdrop-blur-sm opacity-100 bg-size-4 mask-gradient"
+        initial={{ opacity: 0, y: -50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+    >
+        <div className="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="/" className="text-2xl font-bold text-gray-900">
+                Typify
+            </a>
+            <nav>
+                <ul className="flex space-x-8">
+                    {isAuthenticated ? (
+                        <Button
+                            className='bg-green-300'
+                            onClick={() => console.log(currentSong)}
+                        >
+                            {currentSong ? 'Now Playing' : 'Signed In'}
+                        </Button>
+                    ) : (
+                        <Button
+                            className='bg-green-300'
+                            onClick={signInWithSpotify}
+                        >
+                            <AiOutlineSpotify size={20} />
+                        </Button>
+                    )}
+                </ul>
+            </nav>
+        </div>
+    </motion.header>
+);
 }
