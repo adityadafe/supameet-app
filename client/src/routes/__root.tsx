@@ -1,4 +1,4 @@
-import {  createRootRoute } from "@tanstack/react-router";
+import { createRootRoute } from "@tanstack/react-router";
 import "./../index.css";
 import Header from "@/components/nav";
 import TypingTest from "@/components/typer";
@@ -54,7 +54,6 @@ function RootComponent() {
         };
         if (JSON.stringify(songData) !== JSON.stringify(currentSong)) {
           setCurrentSong(songData);
-          console.log(songData);
         }
       } catch (error) {
         console.error('Error in fetch:', error);
@@ -62,7 +61,7 @@ function RootComponent() {
     }
 
     getCurrentSong();
-  }, [isAuthenticated, session]); 
+  }, [isAuthenticated, session]);
 
   useEffect(() => {
     if (!currentSong) return;
@@ -79,7 +78,7 @@ function RootComponent() {
             song: currentSong.name,
             artist_name: currentSong.artist,
           }),
-      })
+        })
 
         if (!rawSongLyrics.ok) {
           console.error('Failed to fetch lyrics');
@@ -88,7 +87,6 @@ function RootComponent() {
 
         const songLyricsData = await rawSongLyrics.json();
         if (songLyricsData.lyrics !== songLyrics) {
-          console.log(songLyricsData.data.lyrics);
           setSongLyrics(songLyricsData.data.lyrics);
         }
       } catch (error) {
@@ -97,20 +95,19 @@ function RootComponent() {
     }
 
     getCurrentSongLyrics();
-  }, [currentSong]); 
+  }, [currentSong]);
 
 
   return (
     <>
       <Header
         isAuthenticated={isAuthenticated}
-        session={session}
         setIsAuthenticated={setIsAuthenticated}
         setSession={setSession}
       />
-      <TypingTest sampleText={songLyrics ? songLyrics : "Please"+"login"+"(or)"+"listen"+"to"+"song"} />
+      <TypingTest sampleText={songLyrics ? songLyrics : "Please" + "login" + "(or)" + "listen" + "to" + "song"} />
       <TypingKeyboard />
-      <Footer/>
+      <Footer />
     </>
   );
 }

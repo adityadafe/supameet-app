@@ -2,30 +2,28 @@ import { motion } from 'framer-motion'
 import { Button } from './ui/button'
 import { AiOutlineSpotify } from "react-icons/ai";
 import { supabase } from '@/lib/supabase';
-import { useEffect, useState } from 'react';
 
 interface HeaderProps {
     isAuthenticated: boolean;
     setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
-    session: any; 
-    setSession: React.Dispatch<React.SetStateAction<any>>; 
+    setSession: React.Dispatch<React.SetStateAction<any>>;
 }
 
-export default function Header({isAuthenticated, setIsAuthenticated, session, setSession}:HeaderProps) {
-  
+export default function Header({ isAuthenticated, setIsAuthenticated, setSession }: HeaderProps) {
 
-    async function logOut(){
-       const{error}= await supabase.auth.signOut()
-            if (error) {
-                console.error('Error fetching session:', error);
-                return;
-            }
-            setSession(null)
-            setIsAuthenticated(false);
+
+    async function logOut() {
+        const { error } = await supabase.auth.signOut()
+        if (error) {
+            console.error('Error fetching session:', error);
+            return;
+        }
+        setSession(null)
+        setIsAuthenticated(false);
     }
 
     async function signInWithSpotify() {
-        const { data, error } = await supabase.auth.signInWithOAuth({
+        const { error } = await supabase.auth.signInWithOAuth({
             provider: "spotify",
             options: {
                 scopes: "user-read-currently-playing",
@@ -56,7 +54,7 @@ export default function Header({isAuthenticated, setIsAuthenticated, session, se
                                 className='bg-green-300'
                                 onClick={logOut}
                             >
-                               Sign-out 
+                                Sign-out
                             </Button>
                         ) : (
                             <Button

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 interface TypingTestProps {
     sampleText: string;
@@ -30,17 +30,17 @@ function TypingTest({ sampleText }: TypingTestProps) {
                 return;
             }
 
-     
+
             if (event.key.length === 1 && !event.ctrlKey && !event.altKey && !event.metaKey) {
                 const newTypedText = typedText + event.key;
                 setTypedText(newTypedText);
-    
+
                 if (newTypedText.length <= sampleText.length) {
                     if (event.key === sampleText[newTypedText.length - 1]) {
                         setCorrectChars(correctChars + 1);
                     }
                 }
-    
+
                 if (newTypedText.length === sampleText.length) {
                     setIsComplete(true);
                 }
@@ -72,9 +72,9 @@ function TypingTest({ sampleText }: TypingTestProps) {
         return Math.round((correctChars / typedText.length) * 100);
     };
 
-    const truncatedText = sampleText.split(' ').length > 300 
-    ? sampleText.split(' ').slice(0, Math.ceil(sampleText.split(' ').length / 2)).join(' ')
-    : sampleText;
+    const truncatedText = sampleText.split(' ').length > 300
+        ? sampleText.split(' ').slice(0, Math.ceil(sampleText.split(' ').length / 2)).join(' ')
+        : sampleText;
 
 
     return (
@@ -87,9 +87,11 @@ function TypingTest({ sampleText }: TypingTestProps) {
                 ))}
             </div>
             {isComplete && (
-                <div className="stats">
-                    <p>Speed: {calculateWPM()} WPM</p>
-                    <p>Accuracy: {calculateAccuracy()}%</p>
+                <div className="mt-10 mb-10 flex justify-center items-center  flex-wrap max-w-7xl mx-auto text-2xl">
+                    <p>Speed: {calculateWPM()} WPM && </p>
+                    <br />
+                    <br />
+                    <p> Accuracy: {calculateAccuracy()}%</p>
                 </div>
             )}
         </div>
