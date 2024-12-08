@@ -23,15 +23,15 @@ const TypingKeyboard: React.FC = () => {
 
             allKeys.forEach((key) => {
                 if (clickSpace && key.id === 'space-button') {
-                    key.className = 'transition ease-in-out duration-300 bg-yellow-500 border border-yellow-500 shadow-lg m-1 p-4 w-72 mx-auto mt-2 rounded-md flex justify-center items-center';
+                    key.className = 'transition ease-in-out duration-300 bg-green-300 border border-yellow-500 shadow-lg m-1 p-4 w-72 mx-auto mt-2 rounded-md flex justify-center items-center';
                 } else if (clickedKey === key.textContent) {
-                    key.className = 'transition ease-in-out duration-300 bg-yellow-500 border border-yellow-500 shadow-lg m-1 p-4 w-11 h-11';
+                    key.className = 'transition ease-in-out duration-300 bg-green-300 border border-yellow-500 shadow-lg rounded-md m-1 p-4 w-11 h-11';
                 }
             });
         
             setTimeout(() => {
                 allKeys.forEach((key) => {
-                    key.classList.remove('bg-yellow-500', 'border-yellow-500','shadow-lg');
+                    key.classList.remove('bg-green-300', 'border-yellow-500','shadow-lg');
                     key.classList.add('border-gray-500', 'text-gray-500');
                 });
             }, 300); 

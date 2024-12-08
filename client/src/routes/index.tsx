@@ -1,12 +1,8 @@
-import Footer from "@/components/footer";
 import { createFileRoute } from "@tanstack/react-router";
 
 function HomePage() {
   return (
     <>
-    
-
-
     </>
   );
 }
