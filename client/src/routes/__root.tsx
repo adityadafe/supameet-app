@@ -2,7 +2,7 @@
 import { Outlet, createRootRoute } from "@tanstack/react-router";
 /* @local-imports */
 import "./../index.css";
-import Header from "@/components/temp-nav";
+import Header from "@/components/nav";
 import TypingTest from "@/components/typer";
 import TypingKeyboard from "@/components/keyboard";
 

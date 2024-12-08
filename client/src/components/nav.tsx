@@ -1,88 +1,156 @@
-import { useState } from "react";
-import { Link } from "@tanstack/react-router";
-import { supabase } from "@/lib/supabase";
-import { Button } from "./ui/button";
+import { motion } from 'framer-motion'
+import { Button } from './ui/button'
+import { AiOutlineSpotify } from "react-icons/ai";
+import { supabase } from '@/lib/supabase';
+import { useEffect, useState } from 'react';
 
-const Nav = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+export default function Header() {
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [session, setSession] = useState<any>(null);
+    const [currentSong, setCurrentSong] = useState<any>(null);
 
-  async function getUser() {
-    const temp = await supabase.auth.getUser()
-    const session = await supabase.auth.getSession()
-    console.log(session)
-    console.log(temp)
-  }
-
-
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
-
-  async function signInWithSpotify() {
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: "spotify",
-      options: {
-        scopes: "user-read-currently-playing",
-      }
-    })
-
-    console.log(data, error)
-  }
+    useEffect(() => {
+        async function getUserSession() {
+            const { data, error } = await supabase.auth.getSession();
+            if (error) {
+                console.error('Error fetching session:', error);
+                return;
+            }
+            setSession(data.session);
+            setIsAuthenticated(!!data.session);
+            console.log(data.session)
+        }
+        getUserSession();
+    }, []);
 
 
+    async function logOut(){
+       const{error}= await supabase.auth.signOut()
+            if (error) {
+                console.error('Error fetching session:', error);
+                return;
+            }
+            setSession(null)
+            setIsAuthenticated(false);
+    }
 
-  return (
-    <nav className="bg-slate-600 text-black fixed w-full z-20 top-0 left-0 ">
-      <div className="max-w-screen-xl flex items-center justify-between mx-auto p-4">
-        <span className="text-2xl font-semibold whitespace-nowrap dark:text-white">
-          STRZZ
-        </span>
-        <div className="flex items-center space-x-3">
-          <button
-            onClick={toggleMenu}
-            type="button"
-            className="text-gray-500 md:hidden hover:text-gray-700 focus:outline-none focus:text-gray-700"
-            aria-controls="navbar-sticky"
-            aria-expanded={isMenuOpen ? "true" : "false"}
-          >
-            <span className="sr-only">Open main menu</span>
-            <svg
-              className="w-6 h-6"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M4 6h16M4 12h16M4 18h16"
-              />
-            </svg>
-          </button>
-          <div
-            className={`${isMenuOpen ? "block" : "hidden"
-              } md:flex md:items-center`}
-            id="navbar-sticky"
-          >
-            <ul className="flex flex-col items-center md:flex-row md:space-x-11 md:items-center mr-20">
-              <li>
-                <Link
-                  to="/"
-                  className="text-white hover:text-blue-700 dark:text-white dark:hover:text-blue-500"
-                >
-                  Home
-                </Link>
-              </li>
+    useEffect(() => {
+        async function getCurrentSong() {
+            if (session && session.provider_token) {
+                try {
+                    const getCurrSongRawRes = await fetch("https://api.spotify.com/v1/me/player/currently-playing", {
+                        method: "GET",
+                        headers: {
+                            "Authorization": `Bearer ${session.provider_token}`,
+                        },
+                    });
 
-              <Button onClick={signInWithSpotify}>sign-in</Button>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </nav>
-  );
-};
+                    if (getCurrSongRawRes.status === 204) {
+                        // No song currently playing
+                        setCurrentSong(null);
+                        return;
+                    }
 
-export default Nav;
+                    const { item } = await getCurrSongRawRes.json();
+                    const songData = {
+                        id: item.id,
+                        image: encodeURIComponent(item.album.images[0].url),
+                        name: item.name,
+                        artist: item.artists[0].name
+                    };
+                    setCurrentSong(songData);
+                    console.log(songData)
+                } catch (error) {
+                    console.error('Error in fetch:', error);
+                }
+            }
+        }
+
+        async function getCurrentSongLyrics() {
+            if (currentSong) {
+                try {
+                    const rawSongLyrics = await fetch(`https://api.lyrics.ovh/v1/${currentSong.artist}/${currentSong.name}`, {
+                        "headers": {
+                            "accept": "application/json, text/javascript, */*; q=0.01",
+                            "accept-language": "en-US,en;q=0.9",
+                            "sec-ch-ua": "\"Google Chrome\";v=\"131\", \"Chromium\";v=\"131\", \"Not_A Brand\";v=\"24\"",
+                            "sec-ch-ua-mobile": "?0",
+                            "sec-ch-ua-platform": "\"Linux\"",
+                            "sec-fetch-dest": "empty",
+                            "sec-fetch-mode": "cors",
+                            "sec-fetch-site": "same-site"
+                        },
+                        "referrer": "https://lyrics.ovh/",
+                        "referrerPolicy": "strict-origin-when-cross-origin",
+                        "body": null,
+                        "method": "GET",
+                        "mode": "cors",
+                        "credentials": "omit"
+                    });
+
+                    if (!rawSongLyrics.ok) {
+                        console.error('Failed to fetch lyrics');
+                        return;
+                    }
+
+                    const songLyrics = await rawSongLyrics.json();
+                    console.log(songLyrics.lyrics);
+                } catch (error) {
+                    console.error('Error fetching lyrics:', error);
+                }
+            }
+        }
+
+            getCurrentSong()
+            getCurrentSongLyrics()
+
+    }, [isAuthenticated, session]);
+
+    async function signInWithSpotify() {
+        const { data, error } = await supabase.auth.signInWithOAuth({
+            provider: "spotify",
+            options: {
+                scopes: "user-read-currently-playing",
+            }
+        });
+
+        if (error) {
+            console.error("Error signing in:", error.message);
+            alert("Failed to sign in with Spotify. Please try again.");
+        }
+    }
+
+    return (
+        <motion.header
+            className="bg-transparent backdrop-blur-sm opacity-100 bg-size-4 mask-gradient"
+            initial={{ opacity: 0, y: -50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+        >
+            <div className="container mx-auto px-6 py-4 flex justify-between items-center">
+                <a href="/" className="text-2xl font-bold text-gray-900">
+                    Typify
+                </a>
+                <nav>
+                    <ul className="flex space-x-8">
+                        {isAuthenticated ? (
+                            <Button
+                                className='bg-green-300'
+                                onClick={logOut}
+                            >
+                               Sign-out 
+                            </Button>
+                        ) : (
+                            <Button
+                                className='bg-green-300'
+                                onClick={signInWithSpotify}
+                            >
+                                <AiOutlineSpotify size={20} />
+                            </Button>
+                        )}
+                    </ul>
+                </nav>
+            </div>
+        </motion.header>
+    );
+}
