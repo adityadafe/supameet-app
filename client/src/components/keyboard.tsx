@@ -6,20 +6,6 @@ const TypingKeyboard: React.FC = () => {
             const clickedKey = event.key;
             const allKeys = document.querySelectorAll('dt');
             const clickSpace = clickedKey === ' ';
-        
-            // allKeys.forEach((key) => {
-            //     if (clickSpace && key.id === 'space-button') {
-            //         key.className = 'transition ease-in-out duration-300 bg-yellow-500 border border-yellow-500 shadow-lg m-1 m-1 p-4 border border-gray-500 text-gray-500 w-72 mx-auto mt-2 rounded-md flex justify-center items-center';
-            //     } else if (clickedKey === key.textContent) {
-            //         //key.className = 'transition ease-in-out duration-300 bg-yellow-500 border border-yellow-500 shadow-lg m-1 m-1 p-4 border border-gray-500 text-gray-500 w-72 mx-auto mt-2 rounded-md flex justify-center items-center';
-            //         key.className = 'transition ease-in-out duration-300 bg-yellow-500 border border-yellow-500 shadow-lg m-1 p-4  w-11 h-11 ';
-            //     } else {
-            //         //key.className = 'transition ease-in-out duration-300 bg-yellow-500 border border-yellow-500 shadow-lg m-1 m-1 p-4 text-gray-500 w-72 mx-auto mt-2 rounded-md flex justify-center items-center';
-
-            //         key.className = 'transition ease-in-out duration-300 bg-yellow-500 border border-yellow-500 shadow-lg m-1 p-4  w-11 h-11 ';
-            //         //key.className = 'transition ease-in-out duration-300 bg-yellow-500 border border-yellow-500 text-black shadow-lg m-1 p-4 border border-gray-500 w-11 h-11 ';
-            //     }
-            // });
 
             allKeys.forEach((key) => {
                 if (clickSpace && key.id === 'space-button') {

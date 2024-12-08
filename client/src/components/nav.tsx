@@ -46,7 +46,7 @@ export default function Header({isAuthenticated, setIsAuthenticated, session, se
             transition={{ duration: 0.5 }}
         >
             <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-                <a href="/" className="text-2xl font-bold text-gray-900">
+                <a href="/" className="text-2xl font-mono text-gray-900">
                     Typify
                 </a>
                 <nav>
